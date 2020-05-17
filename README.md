@@ -1,3 +1,9 @@
+# Latin
+
+Today, Ev had to do a whole bunch of Latin assignments. I read the first unit of her Latin book.
+There are so many endings! They are hard to remember! I can make a tiny program that notices that much.
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
