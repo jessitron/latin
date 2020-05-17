@@ -86,7 +86,7 @@ class InfoAboutWord extends React.Component<{ word: string }> {
         if (tense.suffix.appearsIn(word)) {
           thoughts.push(<li key="">It might be a {" "}
             <span title={d.description} className="term">{d.name}</span> {" "}
-            {nouns.partOfSpeech} in the {" "}
+            {nouns.partOfSpeech} (or adjective) in the {" "}
             <span title={tense.description || "I have no idea"} className="term">{tense.name}</span>: {highlightSuffix(word, tense.suffix)}
           </li>);
         }
