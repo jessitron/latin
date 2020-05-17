@@ -6,12 +6,43 @@ function highlightSuffix(word: string, suffix: string) {
   return <span className="stem">{before}<span className="suffix">{suffix}</span></span>
 }
 
+type Tense = {
+  description: string;
+  suffix: string;
+}
+
+type Declension = {
+  name: string;
+  tenses: Tense[];
+}
+
+type Nouns = {
+  partOfSpeech: "noun";
+  declensions: Declension[];
+}
+
+const nouns = {
+  partOfSpeech: "noun",
+  declensions: [{
+    name: "first declension",
+    tenses: [{
+      name: "nominative singular",
+      suffix: "a"
+    }],
+  }]
+}
+
 class InfoAboutWord extends React.Component<{ word: string }> {
 
   public whatchathink(word: string) {
     let thoughts = [];
-    if (word.endsWith("a")) {
-      thoughts.push(<div>It might be a first declension noun in the nominative singular: {highlightSuffix(word, "a")}</div>);
+    // noun?
+    for (const d of nouns.declensions) {
+      for (const tense of d.tenses) {
+        if (word.endsWith(tense.suffix)) {
+          thoughts.push(<div>It might be a {d.name} {nouns.partOfSpeech} in the {tense.name}: {highlightSuffix(word, tense.suffix)}</div>);
+        }
+      }
     }
     return thoughts;
   }
