@@ -12,3 +12,8 @@ test('stripping the suffix', () => {
   const s = new Suffix("a");
   expect(s.stripFrom("booga")).toBe("boog");
 })
+
+test("suffixes aren't case sensitive", () => {
+  const s = new Suffix("a");
+  expect(s.appearsIn("BOOGA")).toBeTruthy();
+})

@@ -6,6 +6,10 @@
   font-weight: bold;
 }
 
+.term {
+  text-decoration: underline;
+}
+
 .App {
   text-align: center;
 }

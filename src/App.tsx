@@ -13,7 +13,8 @@ export class Suffix {
     this.closeEnough = closeEnough;
   }
   public appearsIn(word: string): boolean {
-    return word.endsWith(this.canonical) || (this.closeEnough.find(sfx => word.endsWith(sfx)) !== undefined);
+    return word.toLowerCase().endsWith(this.canonical) ||
+      (this.closeEnough.find(sfx => word.toLowerCase().endsWith(sfx)) !== undefined);
   }
 
   public stripFrom(word: string): string {
@@ -27,11 +28,13 @@ export class Suffix {
 
 type Tense = {
   name: string;
+  description?: string;
   suffix: Suffix;
 }
 
 type Declension = {
   name: string;
+  description: string;
   tenses: Tense[];
 }
 
@@ -44,24 +47,29 @@ const nouns: Nouns = {
   partOfSpeech: "noun",
   declensions: [{
     name: "first declension",
+    description: "most are feminine; all end in -a in the nominative singular",
     tenses: [{
       name: "nominative singular",
+      description: "like, subject of a sentence",
       suffix: new Suffix("a")
     },
     {
       name: "nominative plural",
+      description: "like, subject of a sentence",
       suffix: new Suffix("ae"),
     },
     {
       name: "genitive singular", suffix: new Suffix("ae"),
+      description: "possessive or 'of ...'"
     },
     {
-      name: "genitive plural", suffix: new Suffix("ārum", "arum")
+      name: "genitive plural", suffix: new Suffix("ārum", "arum"),
+      description: "possessive or 'of ...'"
     },
     { name: "dative singular", suffix: new Suffix("ae") },
     { name: "dative plural", suffix: new Suffix("īs", "is") },
-    { name: "accusative singular", suffix: new Suffix("am") },
-    { name: "accusative plural", suffix: new Suffix("ās", "as") },
+    { name: "accusative singular", suffix: new Suffix("am"), description: "direct object" },
+    { name: "accusative plural", suffix: new Suffix("ās", "as"), description: "direct object" },
     { name: "ablative singular", suffix: new Suffix("ā") },
     { name: "ablative plural", suffix: new Suffix("īs") }
     ],
@@ -76,7 +84,11 @@ class InfoAboutWord extends React.Component<{ word: string }> {
     for (const d of nouns.declensions) {
       for (const tense of d.tenses) {
         if (tense.suffix.appearsIn(word)) {
-          thoughts.push(<div>It might be a {d.name} {nouns.partOfSpeech} in the {tense.name}: {highlightSuffix(word, tense.suffix)}</div>);
+          thoughts.push(<li key="">It might be a {" "}
+            <span title={d.description} className="term">{d.name}</span> {" "}
+            {nouns.partOfSpeech} in the {" "}
+            <span title={tense.description || "I have no idea"} className="term">{tense.name}</span>: {highlightSuffix(word, tense.suffix)}
+          </li>);
         }
       }
     }
