@@ -94,7 +94,13 @@ type Verb = {
   conjugations: Conjugation[],
 }
 
-class VerbTense {
+interface VerbTense {
+  persons: VerbTensePerson[];
+  name: string;
+  description: string;
+}
+
+class PresentTense implements VerbTense {
   public persons: VerbTensePerson[]
   constructor(public name: string, public description: string,
     firstPersonSingular: Suffix, firstPersonPlural: Suffix,
@@ -122,7 +128,7 @@ export const verbs: Verb = {
     name: "first conjugation",
     description: "these verbs have a present stem ending in -ā",
     tenses: [
-      new VerbTense("present tense", "current or ongoing",
+      new PresentTense("present tense", "current or ongoing",
         new Suffix("ō", "o"), new Suffix("āmus", "amus"),
         new Suffix("ās", "as"), new Suffix("ātis", "atis"),
         new Suffix("at"), new Suffix("ant"))
