@@ -1,14 +1,33 @@
-import React, { InputHTMLAttributes } from 'react';
+import React from 'react';
 import './App.css';
 
-function highlightSuffix(word: string, suffix: string) {
-  const before = word.substring(-1 * suffix.length);
-  return <span className="stem">{before}<span className="suffix">{suffix}</span></span>
+export function highlightSuffix(word: string, suffix: Suffix) {
+  return <span className="stem">{suffix.stripFrom(word)}<span className="suffix">{suffix.canonical}</span></span>
+}
+
+export class Suffix {
+
+  public readonly closeEnough: string[];
+
+  constructor(public canonical: string, ...closeEnough: string[]) {
+    this.closeEnough = closeEnough;
+  }
+  public appearsIn(word: string): boolean {
+    return word.endsWith(this.canonical) || (this.closeEnough.find(sfx => word.endsWith(sfx)) !== undefined);
+  }
+
+  public stripFrom(word: string): string {
+    return word.substring(0, word.length - this.canonical.length);
+  }
+
+  public toString() {
+    return this.canonical;
+  }
 }
 
 type Tense = {
-  description: string;
-  suffix: string;
+  name: string;
+  suffix: Suffix;
 }
 
 type Declension = {
@@ -21,14 +40,31 @@ type Nouns = {
   declensions: Declension[];
 }
 
-const nouns = {
+const nouns: Nouns = {
   partOfSpeech: "noun",
   declensions: [{
     name: "first declension",
     tenses: [{
       name: "nominative singular",
-      suffix: "a"
-    }],
+      suffix: new Suffix("a")
+    },
+    {
+      name: "nominative plural",
+      suffix: new Suffix("ae"),
+    },
+    {
+      name: "genitive singular", suffix: new Suffix("ae"),
+    },
+    {
+      name: "genitive plural", suffix: new Suffix("ārum", "arum")
+    },
+    { name: "dative singular", suffix: new Suffix("ae") },
+    { name: "dative plural", suffix: new Suffix("īs", "is") },
+    { name: "accusative singular", suffix: new Suffix("am") },
+    { name: "accusative plural", suffix: new Suffix("ās", "as") },
+    { name: "ablative singular", suffix: new Suffix("ā") },
+    { name: "ablative plural", suffix: new Suffix("īs") }
+    ],
   }]
 }
 
@@ -39,7 +75,7 @@ class InfoAboutWord extends React.Component<{ word: string }> {
     // noun?
     for (const d of nouns.declensions) {
       for (const tense of d.tenses) {
-        if (word.endsWith(tense.suffix)) {
+        if (tense.suffix.appearsIn(word)) {
           thoughts.push(<div>It might be a {d.name} {nouns.partOfSpeech} in the {tense.name}: {highlightSuffix(word, tense.suffix)}</div>);
         }
       }
@@ -73,7 +109,7 @@ class Word extends React.Component<{}, { word: string }> {
 
   public render() {
     return <div>
-      <input onInput={(e) => this.setWord(e)} value={this.state.word}></input>
+      <input onChange={(e) => this.setWord(e)} value={this.state.word}></input>
       <InfoAboutWord word={this.state.word}></InfoAboutWord>
     </div>
   }
