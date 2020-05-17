@@ -26,7 +26,7 @@ export class Suffix {
   }
 }
 
-type Tense = {
+interface Tense {
   name: string;
   description?: string;
   suffix: Suffix;
@@ -76,7 +76,65 @@ const nouns: Nouns = {
   }]
 }
 
+class VerbTensePerson implements Tense {
+  constructor(public name: string,
+    public suffix: Suffix,
+    public description: string) { }
+}
+
+type Conjugation = {
+  name: string,
+  description: string,
+  tenses: VerbTense[],
+}
+
+type Verb = {
+  partOfSpeech: "verb",
+  presentInfinitive: Tense,
+  conjugations: Conjugation[],
+}
+
+class VerbTense {
+  public persons: VerbTensePerson[]
+  constructor(public name: string, public description: string,
+    firstPersonSingular: Suffix, firstPersonPlural: Suffix,
+    secondPersonSingular: Suffix, secondPersonPlural: Suffix,
+    thirdPersonSingular: Suffix, thirdPersonPlural: Suffix) {
+    this.persons = [
+      { name: "first person singular", description: "I ..., I am...", suffix: firstPersonSingular },
+      { name: "first person plural", description: "We ..., we are...", suffix: firstPersonPlural },
+      { name: "second person singular", description: "You ..., you are...", suffix: secondPersonSingular },
+      { name: "second person plural", description: "Y'all ..., y'all are...", suffix: secondPersonPlural },
+      { name: "third person singular", description: "He/she/it ..., it is...", suffix: thirdPersonSingular },
+      { name: "third person plural", description: "They ..., they are...", suffix: thirdPersonPlural },
+    ]
+  }
+
+  public recognizeSuffixes(word: string): Tense[] {
+    return this.persons.filter(t => t.suffix.appearsIn(word))
+  }
+}
+
+export const verbs: Verb = {
+  partOfSpeech: "verb",
+  presentInfinitive: new VerbTensePerson("present infinitive", new Suffix("re"), "to ..."),
+  conjugations: [{
+    name: "first conjugation",
+    description: "these verbs have a present stem ending in -ā",
+    tenses: [
+      new VerbTense("present tense", "current or ongoing",
+        new Suffix("ō", "o"), new Suffix("āmus", "amus"),
+        new Suffix("ās", "as"), new Suffix("ātis", "atis"),
+        new Suffix("at"), new Suffix("ant"))
+    ]
+  }]
+}
+
 class InfoAboutWord extends React.Component<{ word: string }> {
+
+  public printTerm(term: { name: string, description?: string }) {
+    return <span title={term.description || "I don't know either"} className="term">{term.name}</span>;
+  }
 
   public whatchathink(word: string) {
     let thoughts = [];
@@ -85,10 +143,23 @@ class InfoAboutWord extends React.Component<{ word: string }> {
       for (const tense of d.tenses) {
         if (tense.suffix.appearsIn(word)) {
           thoughts.push(<li key="">It might be a {" "}
-            <span title={d.description} className="term">{d.name}</span> {" "}
+            {this.printTerm(d)} {" "}
             {nouns.partOfSpeech} (or adjective) in the {" "}
-            <span title={tense.description || "I have no idea"} className="term">{tense.name}</span>: {highlightSuffix(word, tense.suffix)}
+            {this.printTerm(tense)}: {highlightSuffix(word, tense.suffix)}
           </li>);
+        }
+      }
+    }
+    // verb?
+    for (const conj of verbs.conjugations) {
+      for (const tense of conj.tenses) {
+        for (const person of tense.persons) {
+          if (person.suffix.appearsIn(word)) {
+            thoughts.push(<li>
+              It might be a {this.printTerm(person)} {this.printTerm(tense)} {verbs.partOfSpeech} {" "}
+              in the {this.printTerm(conj)}: {highlightSuffix(word, person.suffix)}
+            </li>)
+          }
         }
       }
     }
