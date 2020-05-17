@@ -209,17 +209,10 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <Word></Word>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <h1>Latin Ending Looker-For</h1>
       </header>
-    </div>
+      <Word></Word>
+    </div >
   );
 }
 
